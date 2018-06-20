@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"encoding/csv"
-	"fmt"
+	"errors"
 	"log"
 	"os"
 	"regexp"
@@ -146,9 +146,12 @@ func alreadyDone(day string) (bool, error) {
 
 }
 
-func parseOneLine(oneline string, t time.Time) (menu9 Record, menu15 Record) {
+func parseOneLine(oneline string, t time.Time) (menu9 Record, menu15 Record, err error) {
 	slice915 := re.FindAllStringSubmatch(oneline, -1)
-	fmt.Println(slice915)
+
+	if len(slice915) < 2 {
+		return Record{}, Record{}, errors.New("failed to parse Find String")
+	}
 
 	menu9 = Record{
 		Id:          t.Format(idFormat) + "09",
@@ -169,7 +172,7 @@ func parseOneLine(oneline string, t time.Time) (menu9 Record, menu15 Record) {
 		DayEnd:      t.AddDate(0, 0, 6).Format(dayFormat),
 	}
 
-	return menu9, menu15
+	return menu9, menu15, nil
 }
 
 func writeNewMenu(menu9 Record, menu15 Record) error {
@@ -218,7 +221,7 @@ func main() {
 	}
 	if done == true {
 		log.Println("already done")
-		// os.Exit(0)
+		os.Exit(0)
 	}
 
 	res, err := doVisionRequest(visionSvc, tweet.Entities.Media[0].Media_url_https)
@@ -233,7 +236,10 @@ func main() {
 		oneline += strings.TrimSpace(o)
 	}
 
-	menu9, menu15 := parseOneLine(oneline, t)
+	menu9, menu15, err := parseOneLine(oneline, t)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	err = writeNewMenu(menu9, menu15)
 	if err != nil {
