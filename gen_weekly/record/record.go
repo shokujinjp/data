@@ -33,3 +33,18 @@ func (r *Record) MarshalStringSlice() []string {
 		r.CanWeekday,
 		r.Description}
 }
+
+func UnmarshalRecordString(recordStr []string) Record {
+	d := Record{
+		Id:          recordStr[0],
+		Name:        recordStr[1],
+		Price:       recordStr[2],
+		Category:    recordStr[3],
+		DayStart:    recordStr[4],
+		DayEnd:      recordStr[5],
+		CanWeekday:  recordStr[6],
+		Description: recordStr[7],
+	}
+
+	return d
+}
