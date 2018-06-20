@@ -13,6 +13,7 @@ import (
 	"golang.org/x/oauth2/google"
 
 	"github.com/ChimeraCoder/anaconda"
+	"github.com/shokujinjp/data/gen_weekly/record"
 	vision "google.golang.org/api/vision/v1"
 )
 
@@ -26,42 +27,6 @@ const (
 var (
 	re = regexp.MustCompile(`(9|15)\.(.*?)(\d+)円`)
 )
-
-type Record struct {
-	Id          string `csv:"id" json:"id"`
-	Name        string `csv:"name" json:"name"`
-	Price       string `csv:"price" json:"price"`
-	Category    string `csv:"category" json:"category"`
-	DayStart    string `csv:"day_start" json":day_start"`
-	DayEnd      string `csv:"day_end" json:"day_end"`
-	CanWeekday  string `csv:"can_weekday" json:"can_weekday"`
-	Description string `csv:"description" json:"description"`
-}
-
-func (r *Record) MarshalString() string {
-	return r.Id + "," +
-		r.Name + "," +
-		r.Price + "," +
-		r.Category + "," +
-		r.DayStart + "," +
-		r.DayEnd + "," +
-		r.CanWeekday + "," +
-		r.Description
-
-}
-
-func (r *Record) MarshalStringSlice() []string {
-	return []string{
-		r.Id,
-		r.Name,
-		r.Price,
-		r.Category,
-		r.DayStart,
-		r.DayEnd,
-		r.CanWeekday,
-		r.Description}
-
-}
 
 func initialize() (*vision.Service, *anaconda.TwitterApi, error) {
 	// create vision service
@@ -146,14 +111,14 @@ func alreadyDone(day string) (bool, error) {
 
 }
 
-func parseOneLine(oneline string, t time.Time) (menu9 Record, menu15 Record, err error) {
+func parseOneLine(oneline string, t time.Time) (menu9 record.Record, menu15 record.Record, err error) {
 	slice915 := re.FindAllStringSubmatch(oneline, -1)
 
 	if len(slice915) < 2 {
-		return Record{}, Record{}, errors.New("failed to parse Find String")
+		return record.Record{}, record.Record{}, errors.New("failed to parse Find String")
 	}
 
-	menu9 = Record{
+	menu9 = record.Record{
 		Id:          t.Format(idFormat) + "09",
 		Name:        slice915[0][2],
 		Price:       slice915[0][3],
@@ -162,7 +127,7 @@ func parseOneLine(oneline string, t time.Time) (menu9 Record, menu15 Record, err
 		DayStart:    t.Format(dayFormat),
 		DayEnd:      t.AddDate(0, 0, 6).Format(dayFormat),
 	}
-	menu15 = Record{
+	menu15 = record.Record{
 		Id:          t.Format(idFormat) + "15",
 		Name:        slice915[1][2],
 		Price:       slice915[1][3],
@@ -175,7 +140,7 @@ func parseOneLine(oneline string, t time.Time) (menu9 Record, menu15 Record, err
 	return menu9, menu15, nil
 }
 
-func writeNewMenu(menu9 Record, menu15 Record) error {
+func writeNewMenu(menu9 record.Record, menu15 record.Record) error {
 	fp, err := os.OpenFile(weeklyFileName, os.O_APPEND|os.O_WRONLY, 0600)
 	if err != nil {
 		return err
