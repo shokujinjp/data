@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/csv"
 	"errors"
+	"fmt"
 	"log"
 	"os"
 	"regexp"
@@ -13,7 +14,7 @@ import (
 	"golang.org/x/oauth2/google"
 
 	"github.com/ChimeraCoder/anaconda"
-	"github.com/shokujinjp/data/gen_weekly/record"
+	"github.com/shokujinjp/shokujinjp-sdk-go/shokujinjp"
 	vision "google.golang.org/api/vision/v1"
 )
 
@@ -58,6 +59,9 @@ func getNewestTweet(api *anaconda.TwitterApi) (anaconda.Tweet, error) {
 	}
 
 	// get newest tweet
+	if len(searchResult.Statuses) < 1 {
+		return anaconda.Tweet{}, errors.New("missing tweet")
+	}
 	tweet := searchResult.Statuses[0]
 	return tweet, nil
 }
@@ -111,14 +115,16 @@ func alreadyDone(day string) (bool, error) {
 
 }
 
-func parseOneLine(oneline string, t time.Time) (menu9 record.Record, menu15 record.Record, err error) {
+func parseOneLine(oneline string, t time.Time) (menu9 shokujinjp.Menu, menu15 shokujinjp.Menu, err error) {
 	slice915 := re.FindAllStringSubmatch(oneline, -1)
 
 	if len(slice915) < 2 {
-		return record.Record{}, record.Record{}, errors.New("failed to parse Find String")
+		errStr := fmt.Sprintf("failed to parse string: %v", slice915)
+
+		return shokujinjp.Menu{}, shokujinjp.Menu{}, errors.New(errStr)
 	}
 
-	menu9 = record.Record{
+	menu9 = shokujinjp.Menu{
 		Id:          t.Format(idFormat) + "09",
 		Name:        slice915[0][2],
 		Price:       slice915[0][3],
@@ -127,7 +133,7 @@ func parseOneLine(oneline string, t time.Time) (menu9 record.Record, menu15 reco
 		DayStart:    t.Format(dayFormat),
 		DayEnd:      t.AddDate(0, 0, 6).Format(dayFormat),
 	}
-	menu15 = record.Record{
+	menu15 = shokujinjp.Menu{
 		Id:          t.Format(idFormat) + "15",
 		Name:        slice915[1][2],
 		Price:       slice915[1][3],
@@ -140,7 +146,7 @@ func parseOneLine(oneline string, t time.Time) (menu9 record.Record, menu15 reco
 	return menu9, menu15, nil
 }
 
-func writeNewMenu(menu9 record.Record, menu15 record.Record) error {
+func writeNewMenu(menu9 shokujinjp.Menu, menu15 shokujinjp.Menu) error {
 	fp, err := os.OpenFile(weeklyFileName, os.O_APPEND|os.O_WRONLY, 0600)
 	if err != nil {
 		return err
@@ -186,7 +192,7 @@ func main() {
 	}
 	if done == true {
 		log.Println("already done")
-		os.Exit(0)
+		// os.Exit(0)
 	}
 
 	res, err := doVisionRequest(visionSvc, tweet.Entities.Media[0].Media_url_https)
