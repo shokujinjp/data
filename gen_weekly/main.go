@@ -192,7 +192,7 @@ func main() {
 	}
 	if done == true {
 		log.Println("already done")
-		// os.Exit(0)
+		os.Exit(0)
 	}
 
 	res, err := doVisionRequest(visionSvc, tweet.Entities.Media[0].Media_url_https)
