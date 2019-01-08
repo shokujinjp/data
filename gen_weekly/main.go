@@ -11,11 +11,10 @@ import (
 	"strings"
 	"time"
 
-	"golang.org/x/oauth2/google"
-
 	"github.com/ChimeraCoder/anaconda"
 	"github.com/shokujinjp/shokujinjp-sdk-go/shokujinjp"
-	vision "google.golang.org/api/vision/v1"
+	"golang.org/x/oauth2/google"
+	"google.golang.org/api/vision/v1"
 )
 
 const (
@@ -62,6 +61,9 @@ func getNewestTweet(api *anaconda.TwitterApi) (anaconda.Tweet, error) {
 	if len(searchResult.Statuses) < 1 {
 		return anaconda.Tweet{}, errors.New("missing tweet")
 	}
+
+	// now Official Twitter API return only 7 days ago.
+	// maybe, searchResult.Statues is only 1
 	tweet := searchResult.Statuses[0]
 	return tweet, nil
 }
@@ -181,6 +183,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	t, err := time.Parse(createAtFormat, tweet.CreatedAt)
 	if err != nil {
 		log.Fatal(err)
