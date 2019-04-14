@@ -22,5 +22,12 @@ jobs:
 workflows:
   version: 2
   gen-weekly-menu:
+    triggers:
+      - schedule:
+        cron: "0 4 * * 1" # every monday 13:00 JST
+        filters:
+          branches:
+            only:
+              - master
     jobs:
       - weekly
