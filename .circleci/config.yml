@@ -1,0 +1,33 @@
+version: 2
+jobs:
+  weekly:
+    docker:
+      - image: circleci/golang:1.11.7
+    steps:
+      - checkout
+      - run: go run ./gen_weekly/main.go
+      - run: |
+          mkdir -p ~/.ssh/
+          chmod 700 ~/.ssh/
+          ssh-keyscan -H github.com >> ~/.ssh/known_hosts
+          git config --global user.name $GIT_USER
+          git config --global user.email $GIT_EMAIL
+          git config --global credential.helper store
+          echo "https://${GITHUB_USER}:${GITHUB_TOKEN}@github.com" > ~/.git-credentials
+          git remote set-url origin https://github.com/shokujinjp/data
+          git checkout master
+          git add .
+          git commit -m "[ci skip] auto commit, generate weekly menu"
+          git push origin master
+workflows:
+  version: 2
+  gen-weekly-menu:
+    triggers:
+      - schedule:
+          cron: "0 4 * * 1" # every monday 13:00 JST
+          filters:
+            branches:
+              only:
+                - master
+    jobs:
+      - weekly
