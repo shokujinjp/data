@@ -18,7 +18,7 @@ jobs:
           name: Save go modules cache
           key: mod-{{ .Environment.COMMON_CACHE_KEY }}-{{ checksum "gen_weekly/go.mod" }}
           paths:
-            - /go/pkg/mod/cache
+            - /go/pkg/mod/
       - run: cd ./gen_weekly ; go run main.go
       - run: |
           mkdir -p ~/.ssh/
@@ -26,11 +26,8 @@ jobs:
           ssh-keyscan -H github.com >> ~/.ssh/known_hosts
           git config --global user.name $GIT_USER
           git config --global user.email $GIT_EMAIL
-          git config --global credential.helper store
-          echo "https://${GITHUB_USER}:${GITHUB_TOKEN}@github.com" > ~/.git-credentials
-          git remote set-url origin https://github.com/shokujinjp/data
           git checkout master
-          git add .
+          git add weekly.csv
           git commit -m "[ci skip] auto commit, generate weekly menu"
           git push origin master
 workflows:
