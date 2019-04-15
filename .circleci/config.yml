@@ -48,3 +48,6 @@ workflows:
                 - master
     jobs:
       - weekly
+  gen-weekly-menu-hand:
+    jobs:
+      - weekly
