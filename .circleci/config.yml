@@ -19,7 +19,7 @@ jobs:
           key: mod-{{ .Environment.COMMON_CACHE_KEY }}-{{ checksum "gen_weekly/go.mod" }}
           paths:
             - /go/pkg/mod/cache
-      - run: go run ./gen_weekly/main.go
+      - run: cd ./gen_weekly ; go run main.go
       - run: |
           mkdir -p ~/.ssh/
           chmod 700 ~/.ssh/
