@@ -21,7 +21,7 @@ jobs:
             - /go/pkg/mod/cache
       - run:
           name: Run tests
-          command: go test gen_weekly/./...
+          command: cd gen_weekly ; go mod download
       - run: go run ./gen_weekly/main.go
       - run: |
           mkdir -p ~/.ssh/
