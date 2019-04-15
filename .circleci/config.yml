@@ -13,15 +13,12 @@ jobs:
             - mod-{{ .Environment.COMMON_CACHE_KEY }}-{{ checksum "gen_weekly/go.mod" }}
       - run:
           name: Vendoring
-          command: go mod download
+          command: cd gen_weekly; go mod download
       - save_cache:
           name: Save go modules cache
           key: mod-{{ .Environment.COMMON_CACHE_KEY }}-{{ checksum "gen_weekly/go.mod" }}
           paths:
             - /go/pkg/mod/cache
-      - run:
-          name: Run tests
-          command: cd gen_weekly ; go mod download
       - run: go run ./gen_weekly/main.go
       - run: |
           mkdir -p ~/.ssh/
