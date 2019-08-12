@@ -52,7 +52,7 @@ func initialize() (*vision.Service, *anaconda.TwitterApi, error) {
 }
 
 func getNewestTweet(api *anaconda.TwitterApi) (anaconda.Tweet, error) {
-	searchResult, err := api.GetSearch("今週の週代わり定食 from:shokujinjp", nil)
+	searchResult, err := api.GetSearch("今週の週替わり定食 from:shokujinjp", nil)
 	if err != nil {
 		return anaconda.Tweet{}, err
 	}
