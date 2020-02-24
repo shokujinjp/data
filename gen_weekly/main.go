@@ -22,10 +22,12 @@ const (
 	dayFormat      = "2006-01-02"
 	idFormat       = "20060102"
 	weeklyFileName = "../weekly.csv"
+	twitterId      = "shokujinjp"
 )
 
 var (
-	re = regexp.MustCompile(`(9|15)\.(.*?)(\d+)円`)
+	re           = regexp.MustCompile(`(9|15)\.(.*?)(\d+)円`)
+	twitterQuery = []string{"今週の週替わり定食", "今週の週変わり定食", "#食神週替わり定食"}
 )
 
 func initialize() (*vision.Service, *anaconda.TwitterApi, error) {
@@ -52,20 +54,50 @@ func initialize() (*vision.Service, *anaconda.TwitterApi, error) {
 }
 
 func getNewestTweet(api *anaconda.TwitterApi) (anaconda.Tweet, error) {
-	searchResult, err := api.GetSearch("今週の週替わり定食 from:shokujinjp", nil)
-	if err != nil {
-		return anaconda.Tweet{}, err
+	fromQuery := " from:" + twitterId
+	result := anaconda.Tweet{
+		Text: "null",
+	}
+	var resultTime time.Time
+
+	for _, query := range twitterQuery {
+		q := query + fromQuery
+		searchResult, err := api.GetSearch(q, nil)
+		if err != nil {
+			return anaconda.Tweet{}, err
+		}
+
+		// get newest tweet
+		if len(searchResult.Statuses) < 1 {
+			log.Println("missing tweet")
+			continue
+		}
+
+		// now Official Twitter API return only 7 days ago.
+		// maybe, searchResult.Statues is only 1
+		tweet := searchResult.Statuses[0]
+		tweetTime, err := tweet.CreatedAtTime()
+		if err != nil {
+			log.Printf("failed to parse time : %s￿￿￿￿￿￿￿", err)
+			continue
+		}
+		if result.Text == "null" {
+			// not set result
+			result = tweet
+		} else if tweetTime.After(resultTime) {
+			// tweetTime is new then resultTime
+			result = tweet
+			resultTime = tweetTime
+		}
+
 	}
 
-	// get newest tweet
-	if len(searchResult.Statuses) < 1 {
+	if result.Text == "null" {
+		// not found!
 		return anaconda.Tweet{}, errors.New("missing tweet")
 	}
 
-	// now Official Twitter API return only 7 days ago.
-	// maybe, searchResult.Statues is only 1
-	tweet := searchResult.Statuses[0]
-	return tweet, nil
+	return result, nil
 }
 
 func doVisionRequest(svc *vision.Service, imageURL string) (*vision.BatchAnnotateImagesResponse, error) {
