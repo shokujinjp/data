@@ -83,13 +83,14 @@ func getNewestTweet(api *anaconda.TwitterApi) (anaconda.Tweet, error) {
 		}
 		if result.Text == "null" {
 			// not set result
+			log.Printf("result.Text is not set from query : %s\n", query)
 			result = tweet
 		} else if tweetTime.After(resultTime) {
 			// tweetTime is new then resultTime
+			log.Printf("found newest tweet from query : %s\n", query)
 			result = tweet
 			resultTime = tweetTime
 		}
-
 	}
 
 	if result.Text == "null" {
