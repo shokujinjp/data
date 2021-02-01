@@ -1,0 +1,36 @@
+name: post
+
+on:
+  push:
+    branches:
+      - master
+  schedule:
+    - cron: "0 4 * * 1" # every monday 13:00 JST
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-go@v2
+      - name: update weekly menu
+        run: |
+          cd ./gen_weekly
+          go run main.go
+        env:
+          SA_JSON: ${{ secrets.SA_JSON }}
+          TW_CS: ${{ secrets.TW_CS }}
+          TW_CK: ${{ secrets.TW_CK }}
+          TW_AT: ${{ secrets.TW_AT }}
+          TW_ATS: ${{ secrets.TW_ATS }}
+    - name: Commit files
+      run: |
+        git add weekly.csv
+        git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+        git config --local user.name "github-actions[bot]" 
+        git commit -m "[ci skip] auto commit, generate weekly menu"
+    - name: Push changes
+      uses: ad-m/github-push-action@master
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        branch: ${{ github.ref }}
