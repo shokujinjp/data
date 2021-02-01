@@ -23,14 +23,14 @@ jobs:
           TW_CK: ${{ secrets.TW_CK }}
           TW_AT: ${{ secrets.TW_AT }}
           TW_ATS: ${{ secrets.TW_ATS }}
-    - name: Commit files
-      run: |
-        git add weekly.csv
-        git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
-        git config --local user.name "github-actions[bot]" 
-        git commit -m "[ci skip] auto commit, generate weekly menu"
-    - name: Push changes
-      uses: ad-m/github-push-action@master
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        branch: ${{ github.ref }}
+      - name: Commit files
+        run: |
+          git add weekly.csv
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]" 
+          git commit -m "[ci skip] auto commit, generate weekly menu"
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.ref }}
