@@ -34,3 +34,9 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           branch: ${{ github.ref }}
+      - uses: rtCamp/action-slack-notify@v2
+        if: always()
+        env:
+          SLACK_USERNAME: "github-actions[bot]"
+          SLACK_ICON: https://avatars.githubusercontent.com/in/15368?v=4
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
