@@ -34,17 +34,11 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           branch: ${{ github.ref }}
-      - uses: rtCamp/action-slack-notify@v2
-        if: success()
-        env:
-          SLACK_USERNAME: "github-actions[bot]"
-          SLACK_ICON: https://avatars.githubusercontent.com/in/15368?v=4
-          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
-          SLACK_COLOR: good
-      - uses: rtCamp/action-slack-notify@v2
-        if: failure()
-        env:
-          SLACK_USERNAME: "github-actions[bot]"
-          SLACK_ICON: https://avatars.githubusercontent.com/in/15368?v=4
-          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
-          SLACK_COLOR: danger
+      - uses: lazy-actions/slatify@master
+        if: always()
+        with:
+          job_name: '*scrape shokujinjo weekly menu*'
+          type: ${{ job.status }}
+          icon_emoji: ':shokujin_icon:'
+          url: ${{ secrets.SLACK_WEBHOOK_URL }}
+          token: ${{ secrets.GITHUB_TOKEN }}
