@@ -37,9 +37,9 @@ jobs:
       - uses: lazy-actions/slatify@master
         if: always()
         with:
-          job_name: '*scrape shokujinjo weekly menu*'
+          job_name: '*scrape shokujinjp weekly menu*'
           type: ${{ job.status }}
           icon_emoji: ':shokujin_icon:'
-          username: 'shokujinjo github-actions[bot]'
+          username: 'shokujinjp [bot]'
           url: ${{ secrets.SLACK_WEBHOOK_URL }}
           token: ${{ secrets.GITHUB_TOKEN }}
