@@ -69,7 +69,7 @@ func getNewestTweet(api *anaconda.TwitterApi) (anaconda.Tweet, error) {
 
 		// get newest tweet
 		if len(searchResult.Statuses) < 1 {
-			log.Println("missing tweet")
+			log.Printf("missing tweet in %s\n", query)
 			continue
 		}
 
@@ -78,13 +78,14 @@ func getNewestTweet(api *anaconda.TwitterApi) (anaconda.Tweet, error) {
 		tweet := searchResult.Statuses[0]
 		tweetTime, err := tweet.CreatedAtTime()
 		if err != nil {
-			log.Printf("failed to parse time : %s￿￿￿￿￿￿￿", err)
+			log.Printf("failed to parse time : %s\n", err)
 			continue
 		}
 		if result.Text == "null" {
 			// not set result
-			log.Printf("result.Text is not set from query : %s\n", query)
+			log.Printf("result.Text is not set from %s, will set : %s\n", query, tweet.Text)
 			result = tweet
+			resultTime = tweetTime
 		} else if tweetTime.After(resultTime) {
 			// tweetTime is new then resultTime
 			log.Printf("found newest tweet from query : %s\n", query)
@@ -95,7 +96,7 @@ func getNewestTweet(api *anaconda.TwitterApi) (anaconda.Tweet, error) {
 
 	if result.Text == "null" {
 		// not found!
-		return anaconda.Tweet{}, errors.New("missing tweet")
+		return anaconda.Tweet{}, errors.New("missing tweet from all queries")
 	}
 
 	return result, nil
