@@ -23,6 +23,11 @@ jobs:
           TW_CK: ${{ secrets.TW_CK }}
           TW_AT: ${{ secrets.TW_AT }}
           TW_ATS: ${{ secrets.TW_ATS }}
+      - name: Save menu name
+        id: menu
+        run: |
+          echo "::set-output name=nine::$(git diff -U0 | grep '+'2' | cut -d',' -f2 | head -n1)"
+          echo "::set-output name=fifteen::$(git diff -U0 | grep '+'2' | cut -d',' -f2 | tail -n1)"
       - name: Commit files
         run: |
           git add weekly.csv
@@ -34,7 +39,7 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           branch: ${{ github.ref }}
-      - uses: lazy-actions/slatify@master
+      - uses: whywaita/slatify@add-any-fields
         if: always()
         with:
           job_name: '*scrape shokujinjp weekly menu*'
@@ -43,3 +48,4 @@ jobs:
           username: 'shokujinjp [bot]'
           url: ${{ secrets.SLACK_WEBHOOK_URL }}
           token: ${{ secrets.GITHUB_TOKEN }}
+          more_fields: '{"9番": ${{ steps.outputs.nine }}, "15番": ${{ steps.outputs.fifteen }}}'
