@@ -48,4 +48,4 @@ jobs:
           username: 'shokujinjp [bot]'
           url: ${{ secrets.SLACK_WEBHOOK_URL }}
           token: ${{ secrets.GITHUB_TOKEN }}
-          more_fields: '{"9番": ${{ steps.menu.outputs.nine }}, "15番": ${{ steps.menu.outputs.fifteen }}}'
+          more_fields: '{"9番": "${{ steps.menu.outputs.nine }}", "15番": "${{ steps.menu.outputs.fifteen }}"}'
