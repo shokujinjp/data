@@ -26,8 +26,8 @@ jobs:
       - name: Save menu name
         id: menu
         run: |
-          echo "::set-output name=nine::$(git diff -U0 | grep '+'2' | cut -d',' -f2 | head -n1)"
-          echo "::set-output name=fifteen::$(git diff -U0 | grep '+'2' | cut -d',' -f2 | tail -n1)"
+          echo "::set-output name=nine::$(git diff -U0 | grep '+2' | cut -d',' -f2 | head -n1)"
+          echo "::set-output name=fifteen::$(git diff -U0 | grep '+2' | cut -d',' -f2 | tail -n1)"
       - name: Commit files
         run: |
           git add weekly.csv
