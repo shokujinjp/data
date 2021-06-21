@@ -34,13 +34,13 @@ jobs:
           git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]" 
           git commit -m "[ci skip] auto commit, generate weekly menu"
-        if: ${{ steps.menu.outputs.nine }} != ""
+        if: ${{ steps.menu.outputs.nine != '' }}
       - name: Push changes
         uses: ad-m/github-push-action@master
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           branch: ${{ github.ref }}
-        if: ${{ steps.menu.outputs.nine }} != ""
+        if: ${{ steps.menu.outputs.nine != '' }}
       - uses: whywaita/slatify@add-any-fields
         if: always()
         with:
