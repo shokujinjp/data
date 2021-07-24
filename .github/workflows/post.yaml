@@ -55,6 +55,7 @@ jobs:
             15番 ${{ steps.menu.outputs.fifteen }}
 
             https://github.com/shokujinjp/data #今日の食神
+        if: ${{ steps.menu.outputs.nine != '' }}
       - uses: whywaita/slatify@add-any-fields
         if: always()
         with:
