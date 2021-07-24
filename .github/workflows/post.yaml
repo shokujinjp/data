@@ -41,6 +41,20 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           branch: ${{ github.ref }}
         if: ${{ steps.menu.outputs.nine != '' }}
+      - name: Tweet change
+        uses: snow-actions/tweet@v1.1.1
+        env:
+          CONSUMER_API_KEY: ${{ secrets.TW_CK }}
+          CONSUMER_API_SECRET_KEY: ${{ secrets.TW_CS }}
+          ACCESS_TOKEN: ${{ secrets.TW_AT }}
+          ACCESS_TOKEN_SECRET: ${{ secrets.TW_ATS }}
+        with:
+          status: |
+            週替わり定食を更新しました！
+            9番 ${{ steps.menu.outputs.nine }}
+            15番 ${{ steps.menu.outputs.fifteen }}
+
+            https://github.com/shokujinjp/data #今日の食神
       - uses: whywaita/slatify@add-any-fields
         if: always()
         with:
