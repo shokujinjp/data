@@ -12,8 +12,8 @@ jobs:
   post:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-go@v2
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v3
       - name: update weekly menu
         run: |
           cd ./gen_weekly
@@ -27,8 +27,8 @@ jobs:
       - name: Save menu name
         id: menu
         run: |
-          echo "::set-output name=nine::$(git diff -U0 | grep '週代わり定食9番' | cut -d',' -f2 | head -n1)"
-          echo "::set-output name=fifteen::$(git diff -U0 | grep '週代わり定食15番' | cut -d',' -f2 | tail -n1)"
+          echo "nine::$(git diff -U0 | grep '週代わり定食9番' | cut -d',' -f2 | head -n1)" >> $GITHUB_OUTPUT
+          echo "fifteen::$(git diff -U0 | grep '週代わり定食15番' | cut -d',' -f2 | tail -n1)" >> $GITHUB_OUTPUT
       - name: Commit files
         run: |
           git add weekly.csv
@@ -43,7 +43,7 @@ jobs:
           branch: ${{ github.ref }}
         if: ${{ steps.menu.outputs.nine != '' }}
       - name: Tweet change
-        uses: snow-actions/tweet@v1.1.1
+        uses: snow-actions/tweet@v1.3.0
         env:
           CONSUMER_API_KEY: ${{ secrets.TW_CK }}
           CONSUMER_API_SECRET_KEY: ${{ secrets.TW_CS }}
