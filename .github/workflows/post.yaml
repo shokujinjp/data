@@ -27,8 +27,8 @@ jobs:
       - name: Save menu name
         id: menu
         run: |
-          echo "nine::$(git diff -U0 | grep '週代わり定食9番' | cut -d',' -f2 | head -n1)" >> $GITHUB_OUTPUT
-          echo "fifteen::$(git diff -U0 | grep '週代わり定食15番' | cut -d',' -f2 | tail -n1)" >> $GITHUB_OUTPUT
+          echo "nine=$(git diff -U0 | grep '週代わり定食9番' | cut -d',' -f2 | head -n1)" >> $GITHUB_OUTPUT
+          echo "fifteen=$(git diff -U0 | grep '週代わり定食15番' | cut -d',' -f2 | tail -n1)" >> $GITHUB_OUTPUT
       - name: Commit files
         run: |
           git add weekly.csv
