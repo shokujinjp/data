@@ -43,7 +43,7 @@ jobs:
           branch: ${{ github.ref }}
         if: ${{ steps.menu.outputs.nine != '' }}
       - name: Tweet change
-        uses: snow-actions/tweet@v1.3.0
+        uses: snow-actions/tweet@v1.4.0
         env:
           CONSUMER_API_KEY: ${{ secrets.TW_CK }}
           CONSUMER_API_SECRET_KEY: ${{ secrets.TW_CS }}
