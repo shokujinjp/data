@@ -23,7 +23,7 @@ id,name,price,category,day_start,day_end,can_weekday,description
 - 「今週の週替わり定食」ツイート: メニュー貼り紙の写真1枚（これが正典。`9.<メニュー名> <価格>円 / 15.<メニュー名> <価格>円` が印字されている）
 - 「#食神週替わり定食」ツイート: 料理写真3枚（補助的に使用）
 
-`gen_weekly` は Twitter API（無料枠）+ Cloud Vision OCR を使っていたが、2023-07 の API 有料化以降動作していない。2026-06 に 2023-07-17〜2026-06-08 分を手動バックフィル済み（PR #31）。
+自動取得ツール `gen_weekly`（Twitter API + Cloud Vision OCR）は 2023-07 の API 有料化以降動作していなかったため、2026-06 に告知投稿用の `.github/workflows/post.yaml` ごと削除した。現在は手動でデータを追記する（LLM ベースの自動化は再実装を検討中）。2026-06 に 2023-07-17〜2026-06-08 分を手動バックフィル済み（PR #31）。
 
 ### バックフィルで得た知見（2026-06 時点）
 
@@ -44,4 +44,4 @@ id,name,price,category,day_start,day_end,can_weekday,description
 ## 開発メモ
 
 - コミットは Conventional Commits 形式、ブランチは `feat/<description>` / `fix/<description>` パターン
-- `.github/workflows/post.yaml` は告知投稿用で、PR に対する CI チェックは存在しない
+- GitHub Actions の workflow は存在せず、PR に対する CI チェックもない
