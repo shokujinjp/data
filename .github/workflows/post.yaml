@@ -1,0 +1,53 @@
+name: post
+
+on:
+  schedule:
+    - cron: "0 4 * * 1" # every monday 13:00 JST
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  gen-menu:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+      - uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v6.4.0
+        with:
+          go-version-file: gen_weekly/go.mod
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version: 22
+      - name: Install xvfb and opencode
+        # nitter の Anubis (PoW ボット対策) は headless ブラウザを拒否するため、
+        # xvfb 上で headed ブラウザを動かす
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y xvfb
+          npm install -g opencode-ai agent-browser
+          npx playwright install --with-deps chromium
+      - name: Generate menu data
+        env:
+          # OpenCode Go / Zen の API キー (https://opencode.ai/auth)
+          OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # 貼り紙画像を読むため vision 対応モデルであること
+          OPENCODE_MODEL: ${{ vars.OPENCODE_MODEL || 'opencode/kimi-k2.6' }}
+        run: |
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          # 手順書の frontmatter (最初の --- ブロック) を除いてプロンプトに展開する
+          PROMPT="$(awk 'BEGIN{fm=0} /^---$/{fm++; next} fm!=1{print}' .opencode/command/gen-menu.md)
+
+          上記の手順を実行した後、weekly.csv または limited.csv に変更がある場合のみ:
+          1. ブランチ feat/menu-update-\$(date +%Y%m%d) を作成して変更を commit する（Conventional Commits 形式）
+          2. push して gh pr create で PR を作成する（本文に追記内容と元ツイートの URL を記載）
+          変更が無ければ何もせず終了する。"
+          xvfb-run -a opencode run --model "$OPENCODE_MODEL" "$PROMPT"

@@ -23,7 +23,13 @@ id,name,price,category,day_start,day_end,can_weekday,description
 - 「今週の週替わり定食」ツイート: メニュー貼り紙の写真1枚（これが正典。`9.<メニュー名> <価格>円 / 15.<メニュー名> <価格>円` が印字されている）
 - 「#食神週替わり定食」ツイート: 料理写真3枚（補助的に使用）
 
-自動取得ツール `gen_weekly`（Twitter API + Cloud Vision OCR）は 2023-07 の API 有料化以降動作していなかったため、2026-06 に告知投稿用の `.github/workflows/post.yaml` ごと削除した。現在は手動でデータを追記する（LLM ベースの自動化は再実装を検討中）。2026-06 に 2023-07-17〜2026-06-08 分を手動バックフィル済み（PR #31）。
+旧自動取得ツール `gen_weekly`（Twitter API + Cloud Vision OCR）は 2023-07 の API 有料化以降動作していなかったため 2026-06 に一度削除し、同月に LLM ベースで再実装した。現在の構成:
+
+- `/gen-menu`（`.opencode/command/gen-menu.md`、Claude Code 用ラッパーは `.claude/commands/gen-menu.md`）: ツイート取得と画像読み取りの手順書。週替わり定食に加え、冷やし中華などの期間限定メニュー告知にも対応
+- `gen_weekly/`: 読み取った内容を検証して `weekly.csv` / `limited.csv` に追記する Go CLI（重複チェック・月曜チェック付き）
+- `.github/workflows/post.yaml`: 毎週月曜 13:00 JST に opencode で手順書を実行し、変更があれば PR を作成。`OPENCODE_API_KEY` secret（OpenCode Go / Zen、https://opencode.ai/auth）が必要。モデルはリポジトリ変数 `OPENCODE_MODEL` で変更可能（デフォルト `opencode/kimi-k2.6`。貼り紙画像を読むため vision 対応モデルであること）
+
+2026-06 に 2023-07-17〜2026-06-08 分を手動バックフィル済み（PR #31）。
 
 ### バックフィルで得た知見（2026-06 時点）
 
@@ -44,4 +50,4 @@ id,name,price,category,day_start,day_end,can_weekday,description
 ## 開発メモ
 
 - コミットは Conventional Commits 形式、ブランチは `feat/<description>` / `fix/<description>` パターン
-- GitHub Actions の workflow は存在せず、PR に対する CI チェックもない
+- GitHub Actions: `ci.yaml`（actionlint + gen_weekly の go vet / go test）と `post.yaml`（週次のメニュー自動取得）
